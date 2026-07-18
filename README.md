@@ -173,3 +173,187 @@ SELECT n,
 FROM Numbers5
 WHERE n <= 400;
 select * from bills;
+
+SQL Queries-
+
+SELECT * FROM MenuItems;
+
+SELECT Name, Email FROM Customers;
+
+SELECT * FROM TableBookings WHERE Status = 'Reserved';
+
+SELECT * FROM CustomerOrders WHERE Status = 'Pending';
+
+SELECT * FROM Bills WHERE PaymentStatus = 'Paid';
+
+SELECT ItemName, Price FROM MenuItems WHERE Price > 300;
+
+SELECT Name, LoyaltyPoints FROM Customers WHERE LoyaltyPoints > 50;
+
+SELECT * FROM TableBookings WHERE Seats > 5;
+
+SELECT * FROM Bills WHERE PaymentMethod = 'Card';
+
+SELECT * FROM CustomerOrders 
+WHERE OrderDateTime >= NOW() - INTERVAL 60 MINUTE;
+
+SELECT o.OrderID, c.Name, o.Status
+FROM CustomerOrders o
+JOIN Customers c ON o.CustomerID = c.CustomerID;
+
+SELECT d.OrderDetailID, m.ItemName, d.Quantity, d.Subtotal
+FROM OrderDetails d
+JOIN MenuItems m ON d.ItemID = m.ItemID;
+
+SELECT b.BillID, c.Name, b.TotalAmount, b.PaymentStatus
+FROM Bills b
+JOIN CustomerOrders o ON b.OrderID = o.OrderID
+JOIN Customers c ON o.CustomerID = c.CustomerID;
+
+SELECT t.TableID, c.Name, t.Status
+FROM TableBookings t
+JOIN Customers c ON t.CustomerID = c.CustomerID;
+
+SELECT o.OrderID, t.Status, o.OrderDateTime
+FROM CustomerOrders o
+JOIN TableBookings t ON o.TableID = t.TableID;
+
+SELECT COUNT(*) AS TotalCustomers FROM Customers;
+
+SELECT AVG(Price) AS AvgPrice FROM MenuItems;
+
+SELECT SUM(TotalAmount) AS TotalRevenue FROM Bills;
+
+SELECT COUNT(*) AS CompletedOrders 
+FROM CustomerOrders WHERE Status = 'Completed';
+
+SELECT MAX(TotalAmount) AS MaxBill FROM Bills;
+
+SELECT CustomerID, COUNT(*) AS TotalOrders
+FROM CustomerOrders
+GROUP BY CustomerID;
+
+SELECT PaymentMethod, AVG(TotalAmount) AS AvgAmount
+FROM Bills
+GROUP BY PaymentMethod;
+
+SELECT Name, LoyaltyPoints
+FROM Customers
+ORDER BY LoyaltyPoints DESC
+LIMIT 5;
+
+SELECT Status, COUNT(*) AS CountBookings
+FROM TableBookings
+GROUP BY Status;
+
+SELECT Category, MAX(Price) AS MaxPrice
+FROM MenuItems
+GROUP BY Category;
+
+SELECT o.OrderID, c.Name, t.Status
+FROM CustomerOrders o
+JOIN Customers c ON o.CustomerID = c.CustomerID
+JOIN TableBookings t ON o.TableID = t.TableID;
+
+SELECT b.BillID, b.TotalAmount, o.Status, c.Name
+FROM Bills b
+JOIN CustomerOrders o ON b.OrderID = o.OrderID
+JOIN Customers c ON o.CustomerID = c.CustomerID;
+
+SELECT DISTINCT m.ItemName
+FROM OrderDetails d
+JOIN CustomerOrders o ON d.OrderID = o.OrderID
+JOIN Customers c ON o.CustomerID = c.CustomerID
+JOIN MenuItems m ON d.ItemID = m.ItemID
+WHERE c.Name = 'Customer 10';
+
+SELECT c.CustomerID, c.Name, SUM(b.TotalAmount) AS TotalSpent
+FROM Customers c
+JOIN CustomerOrders o ON c.CustomerID = o.CustomerID
+JOIN Bills b ON o.OrderID = b.OrderID
+GROUP BY c.CustomerID, c.Name;
+
+SELECT o.OrderID, COUNT(d.ItemID) AS ItemCount
+FROM CustomerOrders o
+JOIN OrderDetails d ON o.OrderID = d.OrderID
+GROUP BY o.OrderID
+HAVING COUNT(d.ItemID) > 3;
+
+SELECT Name
+FROM Customers
+WHERE CustomerID IN (
+    SELECT o.CustomerID
+    FROM CustomerOrders o
+    JOIN Bills b ON o.OrderID = b.OrderID
+    GROUP BY o.CustomerID
+    HAVING SUM(b.TotalAmount) > 1000
+);
+
+SELECT ItemName
+FROM MenuItems
+WHERE ItemID NOT IN (
+    SELECT DISTINCT ItemID FROM OrderDetails
+);
+
+SELECT Name
+FROM Customers
+WHERE CustomerID IN (
+    SELECT CustomerID
+    FROM TableBookings
+    GROUP BY CustomerID
+    HAVING COUNT(*) > 5
+);
+
+SELECT o.CustomerID, MAX(o.OrderDateTime) AS LatestOrder
+FROM CustomerOrders o
+GROUP BY o.CustomerID;
+
+SELECT AVG(b.TotalAmount) AS AvgBill
+FROM Bills b
+JOIN CustomerOrders o ON b.OrderID = o.OrderID
+WHERE o.CustomerID IN (
+    SELECT CustomerID
+    FROM CustomerOrders
+    GROUP BY CustomerID
+    HAVING COUNT(*) > 10
+);
+
+SELECT c.CustomerID, c.Name, SUM(b.TotalAmount) AS TotalSpent,
+       RANK() OVER (ORDER BY SUM(b.TotalAmount) DESC) AS RankOrder
+FROM Customers c
+JOIN CustomerOrders o ON c.CustomerID = o.CustomerID
+JOIN Bills b ON o.OrderID = b.OrderID
+GROUP BY c.CustomerID, c.Name;
+
+SELECT m.ItemName, SUM(d.Quantity) AS TotalOrdered
+FROM OrderDetails d
+JOIN MenuItems m ON d.ItemID = m.ItemID
+GROUP BY m.ItemName
+ORDER BY TotalOrdered DESC
+LIMIT 1;
+
+SELECT t.TableID, COUNT(o.OrderID) AS TotalOrders
+FROM TableBookings t
+JOIN CustomerOrders o ON t.TableID = o.TableID
+GROUP BY t.TableID
+ORDER BY TotalOrders DESC
+LIMIT 1;
+
+SELECT DISTINCT c.Name
+FROM Customers c
+JOIN TableBookings t ON c.CustomerID = t.CustomerID
+WHERE c.CustomerID IN (
+    SELECT CustomerID FROM TableBookings WHERE Status = 'Reserved'
+)
+AND c.CustomerID IN (
+    SELECT CustomerID FROM TableBookings WHERE Status = 'Cancelled'
+);
+
+SELECT DATE(OrderDateTime) AS OrderDate, SUM(b.TotalAmount) AS DailyRevenue
+FROM CustomerOrders o
+JOIN Bills b ON o.OrderID = b.OrderID
+GROUP BY DATE(OrderDateTime)
+ORDER BY OrderDate;
+
+
+
